@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: kodigos_challenge_db
+      POSTGRES_USER: kodigos_user
+      POSTGRES_PASSWORD: kodigos_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    image: openjdk:17-jdk-slim
+    container_name: kodigos_api
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/kodigos_challenge_db
+      SPRING_DATASOURCE_USERNAME: kodigos_user
+      SPRING_DATASOURCE_PASSWORD: kodigos_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      - postgres
+    volumes:
+      - ./target/api-0.0.1-SNAPSHOT.jar:/app.jar
+    command: "java -jar app.jar"
+volumes:
+  postgres_data:
